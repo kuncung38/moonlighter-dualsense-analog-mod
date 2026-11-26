@@ -86,6 +86,13 @@ The compiled DLL will be output to `src\bin\Release\netstandard2.0\AnalogMovemen
 
 ---
 
+## Support
+
+If this mod improved your Moonlighter experience, you can support my work here:
+- [Saweria](https://saweria.co/kuncung38)
+
+---
+
 ## Credits
 
 - Powered by [BepInEx 5](https://github.com/BepInEx/BepInEx) (LGPL-2.1) and [HarmonyX](https://github.com/BepInEx/HarmonyX).
