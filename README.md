@@ -89,7 +89,8 @@ The compiled DLL will be output to `src\bin\Release\netstandard2.0\AnalogMovemen
 ## Support
 
 If this mod improved your Moonlighter experience, you can support my work here:
-- [Saweria](https://saweria.co/kuncung38)
+- **International (PayPal / Card / Apple Pay / Google Pay):** [SociaBuzz](https://sociabuzz.com/kuncung38/tribe)
+- **Indonesia (QRIS / GoPay / OVO / DANA):** [Saweria](https://saweria.co/kuncung38)
 
 ---
 
