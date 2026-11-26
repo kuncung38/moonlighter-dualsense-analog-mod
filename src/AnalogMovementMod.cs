@@ -95,13 +95,56 @@ namespace AnalogMovementMod
             }
             _lastCheckTick = currentTick;
 
-            if (System.Environment.OSVersion.Platform == System.PlatformID.Unix ||
-                System.Environment.OSVersion.Platform == System.PlatformID.MacOSX)
+            if (System.Environment.OSVersion.Platform == System.PlatformID.MacOSX ||
+                (System.Environment.OSVersion.Platform == System.PlatformID.Unix && System.IO.Directory.Exists("/System/Library")))
+            {
+                return _isDualSenseCached = IsDualSenseConnectedMacOS();
+            }
+
+            if (System.Environment.OSVersion.Platform == System.PlatformID.Unix)
             {
                 return _isDualSenseCached = IsDualSenseConnectedLinux();
             }
 
             return _isDualSenseCached = IsDualSenseConnectedWindows();
+        }
+
+        private static bool IsDualSenseConnectedMacOS()
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "/usr/sbin/ioreg",
+                    Arguments = "-rc IOHIDDevice",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+
+                using (var proc = System.Diagnostics.Process.Start(psi))
+                {
+                    if (proc == null) return false;
+                    string output = proc.StandardOutput.ReadToEnd();
+                    proc.WaitForExit(1500);
+
+                    // Check each IOHIDDevice block for Sony VID (1356 / 0x054c) + DualSense PID (3302 / 0x0ce6 or 3570 / 0x0df2)
+                    string[] blocks = output.Split(new[] { "+-o " }, System.StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string block in blocks)
+                    {
+                        bool hasSonyVid = block.Contains("\"VendorID\" = 1356") || block.ToUpperInvariant().Contains("054C");
+                        bool hasDualSensePid = block.Contains("\"ProductID\" = 3302") || block.Contains("\"ProductID\" = 3570") ||
+                                               block.ToUpperInvariant().Contains("0CE6") || block.ToUpperInvariant().Contains("0DF2");
+                        if (hasSonyVid && hasDualSensePid)
+                            return true;
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore process/teardown errors
+            }
+            return false;
         }
 
         private static bool IsDualSenseId(string text)

@@ -9,9 +9,11 @@ UNIX_BEPINEX_URL="https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/B
 echo ""
 echo "====================================================="
 echo "  Moonlighter - DualSense & 360 Analog Movement Mod  "
-echo "               SteamOS / Linux Installer             "
+echo "           SteamOS / Linux / macOS Installer         "
 echo "====================================================="
 echo ""
+
+OS_NAME="$(uname -s)"
 
 find_moonlighter() {
     local candidates=(
@@ -19,12 +21,14 @@ find_moonlighter() {
         "$HOME/.steam/steam/steamapps/common/Moonlighter"
         "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/common/Moonlighter"
         "/run/media/mmcblk0p1/steamapps/common/Moonlighter"
+        "$HOME/Library/Application Support/Steam/steamapps/common/Moonlighter"
     )
 
     for vdf in \
         "$HOME/.local/share/Steam/steamapps/libraryfolders.vdf" \
         "$HOME/.steam/steam/steamapps/libraryfolders.vdf" \
-        "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/libraryfolders.vdf"; do
+        "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/libraryfolders.vdf" \
+        "$HOME/Library/Application Support/Steam/steamapps/libraryfolders.vdf"; do
         if [[ -f "$vdf" ]]; then
             while IFS= read -r lib; do
                 candidates+=("$lib/steamapps/common/Moonlighter")
@@ -33,7 +37,7 @@ find_moonlighter() {
     done
 
     for dir in "${candidates[@]}"; do
-        if [[ -f "$dir/Moonlighter.exe" || -f "$dir/Moonlighter.x86_64" ]]; then
+        if [[ -f "$dir/Moonlighter.exe" || -f "$dir/Moonlighter.x86_64" || -d "$dir/Moonlighter.app" ]]; then
             echo "$dir"
             return 0
         fi
@@ -48,8 +52,8 @@ else
     read -rp "Could not auto-detect Moonlighter. Enter full path to Moonlighter folder: " GAME_DIR
 fi
 
-if [[ -z "$GAME_DIR" || ( ! -f "$GAME_DIR/Moonlighter.exe" && ! -f "$GAME_DIR/Moonlighter.x86_64" ) ]]; then
-    echo "ERROR: Moonlighter.exe or Moonlighter.x86_64 not found in '$GAME_DIR'."
+if [[ -z "$GAME_DIR" || ( ! -f "$GAME_DIR/Moonlighter.exe" && ! -f "$GAME_DIR/Moonlighter.x86_64" && ! -d "$GAME_DIR/Moonlighter.app" ) ]]; then
+    echo "ERROR: Moonlighter.exe, Moonlighter.x86_64, or Moonlighter.app not found in '$GAME_DIR'."
     exit 1
 fi
 
@@ -72,19 +76,31 @@ if [[ -f "$GAME_DIR/Moonlighter.exe" ]]; then
     echo '  WINEDLLOVERRIDES="winhttp=n,b" %command%'
     echo ""
 else
-    echo "Detected Native Linux build."
-    echo "Downloading BepInEx 5.4.22.0 for Linux..."
+    if [[ -d "$GAME_DIR/Moonlighter.app" ]]; then
+        EXEC_NAME="Moonlighter.app"
+        PLATFORM_LABEL="macOS"
+    else
+        EXEC_NAME="Moonlighter.x86_64"
+        PLATFORM_LABEL="Native Linux"
+    fi
+
+    echo "Detected $PLATFORM_LABEL build."
+    echo "Downloading BepInEx 5.4.22.0..."
     curl -fsSL "$UNIX_BEPINEX_URL" -o "$TMP_DIR/bepinex_unix.zip"
     unzip -qo "$TMP_DIR/bepinex_unix.zip" -d "$GAME_DIR"
     mkdir -p "$GAME_DIR/BepInEx/plugins"
     cp -f "$TMP_DIR/mod/BepInEx/plugins/AnalogMovementMod.dll" "$GAME_DIR/BepInEx/plugins/"
     if [[ -f "$GAME_DIR/run_bepinex.sh" ]]; then
-        sed -i 's/executable_name=""/executable_name="Moonlighter.x86_64"/' "$GAME_DIR/run_bepinex.sh" || true
+        if [[ "$(uname -s)" == "Darwin" ]]; then
+            sed -i '' "s/executable_name=\"\"/executable_name=\"$EXEC_NAME\"/" "$GAME_DIR/run_bepinex.sh" || true
+        else
+            sed -i "s/executable_name=\"\"/executable_name=\"$EXEC_NAME\"/" "$GAME_DIR/run_bepinex.sh" || true
+        fi
         chmod +x "$GAME_DIR/run_bepinex.sh"
     fi
 
     echo ""
-    echo "SUCCESS! Installed for Native Linux."
+    echo "SUCCESS! Installed for $PLATFORM_LABEL."
     echo "IMPORTANT: In Steam -> Moonlighter -> Properties -> Launch Options, set:"
     echo '  ./run_bepinex.sh %command%'
     echo ""

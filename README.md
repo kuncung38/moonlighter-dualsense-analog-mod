@@ -36,22 +36,22 @@ Fixes Moonlighter's clunky 8-directional controller movement and adds automatic 
 
 *(Manual install: extract the release ZIP contents directly into your `Moonlighter` game folder where `Moonlighter.exe` is located.)*
 
-### Option C: SteamOS / Steam Deck / Linux
-1. Switch to **Desktop Mode** and open **Konsole**.
+### Option C: SteamOS / Steam Deck / Linux / macOS
+1. Open **Konsole** (Desktop Mode on Steam Deck) or **Terminal** (macOS / Linux).
 2. Paste and run:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/kuncung38/moonlighter-dualsense-analog-mod/main/install.sh | bash
    ```
 3. Add the **Launch Option** printed by the installer in Steam -> Moonlighter -> Properties -> General:
-   - **If using Proton (recommended for DualSense icon detection):**
+   - **If using Proton (SteamOS/Linux):**
      ```
      WINEDLLOVERRIDES="winhttp=n,b" %command%
      ```
-   - **If using the Native Linux build:**
+   - **If using Native Linux or macOS:**
      ```
      ./run_bepinex.sh %command%
      ```
-   *(Note: Both 360° analog movement and automatic DualSense PlayStation icon detection work on Windows, Proton, and Native Linux/SteamOS!)*
+   *(Note: Both 360° analog movement and automatic DualSense PlayStation icon detection work on Windows, SteamOS/Proton, Native Linux, and macOS!)*
 
 ---
 
