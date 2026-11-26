@@ -51,7 +51,7 @@ Fixes Moonlighter's clunky 8-directional controller movement and adds automatic 
      ```
      ./run_bepinex.sh %command%
      ```
-   *(Note: 360° analog movement works on both Native Linux and Proton. Automatic DualSense hardware icon detection uses Windows Raw Input `user32.dll`, so on Native Linux it safely falls back to Moonlighter's default icon detection.)*
+   *(Note: Both 360° analog movement and automatic DualSense PlayStation icon detection work on Windows, Proton, and Native Linux/SteamOS!)*
 
 ---
 

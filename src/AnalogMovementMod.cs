@@ -88,20 +88,68 @@ namespace AnalogMovementMod
         public static bool IsDualSenseConnected()
         {
             int currentTick = System.Environment.TickCount;
-            // Only check every 60000 milliseconds (60 seconds) to completely eliminate any chance of P/Invoke micro-stutters
+            // Only check every 60000 milliseconds (60 seconds) to completely eliminate any chance of polling micro-stutters
             if (System.Math.Abs(currentTick - _lastCheckTick) < 60000 && _lastCheckTick != 0)
             {
                 return _isDualSenseCached;
             }
             _lastCheckTick = currentTick;
 
+            if (System.Environment.OSVersion.Platform == System.PlatformID.Unix ||
+                System.Environment.OSVersion.Platform == System.PlatformID.MacOSX)
+            {
+                return _isDualSenseCached = IsDualSenseConnectedLinux();
+            }
+
+            return _isDualSenseCached = IsDualSenseConnectedWindows();
+        }
+
+        private static bool IsDualSenseId(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            string upper = text.ToUpperInvariant();
+            // Sony VID = 054C, DualSense PID = 0CE6, DualSense Edge PID = 0DF2
+            return upper.Contains("054C") && (upper.Contains("0CE6") || upper.Contains("0DF2"));
+        }
+
+        private static bool IsDualSenseConnectedLinux()
+        {
+            try
+            {
+                const string hidPath = "/sys/bus/hid/devices";
+                if (System.IO.Directory.Exists(hidPath))
+                {
+                    foreach (string dir in System.IO.Directory.GetDirectories(hidPath))
+                    {
+                        if (IsDualSenseId(dir))
+                            return true;
+                    }
+                }
+
+                const string procInputPath = "/proc/bus/input/devices";
+                if (System.IO.File.Exists(procInputPath))
+                {
+                    string content = System.IO.File.ReadAllText(procInputPath).ToUpperInvariant();
+                    if (content.Contains("VENDOR=054C") && (content.Contains("PRODUCT=0CE6") || content.Contains("PRODUCT=0DF2")))
+                        return true;
+                }
+            }
+            catch
+            {
+                // Ignore sysfs/procfs permission or teardown errors
+            }
+            return false;
+        }
+
+        private static bool IsDualSenseConnectedWindows()
+        {
             try
             {
                 uint deviceCount = 0;
                 uint dwSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(RAWINPUTDEVICELIST));
 
                 if (GetRawInputDeviceList(System.IntPtr.Zero, ref deviceCount, dwSize) != 0 || deviceCount == 0)
-                    return _isDualSenseCached = false;
+                    return false;
 
                 System.IntPtr pRawInputDeviceList = System.Runtime.InteropServices.Marshal.AllocHGlobal((int)(dwSize * deviceCount));
                 try
@@ -126,14 +174,9 @@ namespace AnalogMovementMod
                                 GetRawInputDeviceInfo(rid.hDevice, RIDI_DEVICENAME, pData, ref pcbSize);
                                 string deviceName = System.Runtime.InteropServices.Marshal.PtrToStringAuto(pData);
 
-                                if (!string.IsNullOrEmpty(deviceName))
+                                if (IsDualSenseId(deviceName))
                                 {
-                                    deviceName = deviceName.ToUpper();
-                                    // Sony VID = 054C, DualSense PID = 0CE6
-                                    if (deviceName.Contains("054C") && deviceName.Contains("0CE6"))
-                                    {
-                                        return _isDualSenseCached = true;
-                                    }
+                                    return true;
                                 }
                             }
                             finally
@@ -152,7 +195,7 @@ namespace AnalogMovementMod
             {
                 // Ignore exceptions during teardown/Alt+F4
             }
-            return _isDualSenseCached = false;
+            return false;
         }
     }
 

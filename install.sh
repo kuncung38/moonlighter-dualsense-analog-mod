@@ -88,7 +88,6 @@ else
     echo "IMPORTANT: In Steam -> Moonlighter -> Properties -> Launch Options, set:"
     echo '  ./run_bepinex.sh %command%'
     echo ""
-    echo "Note: DualSense Raw Input auto-icon detection uses Windows user32.dll and is skipped on Native Linux."
-    echo "360-degree analog movement works on both Native Linux and Proton."
+    echo "Note: Both 360-degree analog movement and DualSense PlayStation icon detection are enabled!"
     echo ""
 fi
