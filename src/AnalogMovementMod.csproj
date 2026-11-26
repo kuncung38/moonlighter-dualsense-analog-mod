@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <MoonlighterDir Condition="'$(MoonlighterDir)' == '' and Exists('C:\Program Files (x86)\Steam\steamapps\common\Moonlighter\Moonlighter.exe')">C:\Program Files (x86)\Steam\steamapps\common\Moonlighter</MoonlighterDir>
+    <MoonlighterDir Condition="'$(MoonlighterDir)' == '' and Exists('E:\SteamLibrary\steamapps\common\Moonlighter\Moonlighter.exe')">E:\SteamLibrary\steamapps\common\Moonlighter</MoonlighterDir>
+    <MoonlighterDir Condition="'$(MoonlighterDir)' == ''">E:\SteamLibrary\steamapps\common\Moonlighter</MoonlighterDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(MoonlighterDir)\Moonlighter_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(MoonlighterDir)\Moonlighter_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(MoonlighterDir)\Moonlighter_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="InControl">
+      <HintPath>$(MoonlighterDir)\Moonlighter_Data\Managed\InControl.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(MoonlighterDir)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(MoonlighterDir)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
