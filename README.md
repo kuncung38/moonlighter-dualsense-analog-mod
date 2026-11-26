@@ -86,7 +86,20 @@ The compiled DLL will be output to `src\bin\Release\netstandard2.0\AnalogMovemen
 
 ---
 
-## Support
+## FAQ & Troubleshooting
+
+### Why does Moonlighter controller movement feel stiff or locked to 8 directions?
+Moonlighter snaps left-stick input to 8 cardinal/diagonal directions by default. This mod fixes Moonlighter's 8-directional movement by reading raw 360° analog stick values directly.
+
+### How do I get PS5 DualSense PlayStation button icons in Moonlighter on PC?
+Moonlighter's legacy `InControl` input library cannot detect a PS5 DualSense without Steam Input, and Steam Input normally forces Xbox button prompts. Keep **Steam Input enabled** and install this mod — it automatically detects DualSense / DualSense Edge over USB and Bluetooth and switches prompts to PlayStation icons.
+
+### Does this work on Steam Deck / SteamOS, Linux, and macOS?
+Yes! Run the 1-click `install.sh` script above and set the printed Steam Launch Option (`WINEDLLOVERRIDES="winhttp=n,b" %command%` for Proton, or `./run_bepinex.sh %command%` for Native Linux / macOS).
+
+---
+
+## ❤️ Support
 
 If this mod improved your Moonlighter experience, you can support my work here:
 - **International (PayPal / Card / Apple Pay / Google Pay):** [SociaBuzz](https://sociabuzz.com/kuncung38/tribe)
